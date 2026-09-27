@@ -1,0 +1,33 @@
+name: Sync mailboxes
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: sync-mailboxes
+  cancel-in-progress: false
+
+permissions: {}
+
+jobs:
+  sync:
+    name: POST /internal/sync/mailboxes
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Trigger mailbox sync
+        env:
+          API_URL: ${{ vars.API_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$API_URL" ] || [ -z "$CRON_SECRET" ]; then
+            echo "::error::API_URL (variable) and CRON_SECRET (secret) must both be set in Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+          curl --fail-with-body --silent --show-error \
+            --max-time 240 \
+            --request POST \
+            --header "Authorization: Bearer $CRON_SECRET" \
+            "${API_URL%/}/internal/sync/mailboxes"
