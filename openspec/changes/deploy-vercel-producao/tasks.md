@@ -14,11 +14,12 @@
 
 ## 3. Banco de dados
 
-- [ ] 3.1 Criar o banco Neon Free pela Vercel Marketplace (região próxima: `sa-east-1` se disponível, senão `us-east-1`) e verificar que `DATABASE_URL` e `POSTGRES_URL_NON_POOLING` foram gerados
+- [ ] 3.1 Criar o banco Neon Free pela Vercel Marketplace (região `aws-eu-central-1` (Frankfurt)) e verificar que `DATABASE_URL` e `POSTGRES_URL_NON_POOLING` foram gerados
 
 ## 4. Projeto Vercel da API
 
 - [ ] 4.1 Importar o fork na Vercel como projeto `crm-api`, Root Directory `apps/api`, e conectar o banco Neon ao projeto
+- [ ] 4.1.1 Definir Function Region `fra1` (Frankfurt) em Settings → Functions do projeto `crm-api` e verificar no log do deploy que as funções rodam em `fra1`
 - [ ] 4.2 Gerar segredos novos de produção (`BETTER_AUTH_SECRET`, `CRON_SECRET` ≥16 chars, `AGENT_BRIDGE_SECRET`) e guardá-los num gerenciador de senhas; verificar que nenhum é igual ao do `.env` local
 - [ ] 4.3 Configurar as variáveis da API (`BETTER_AUTH_SECRET`, `ALLOWED_SIGN_IN`, `GOOGLE_CLIENT_ID/SECRET`, `CRON_SECRET`, `API_URL=https://api.guardon.me`, `APP_URL=https://crm.guardon.me`, `AUTH_COOKIE_DOMAIN=.guardon.me`) e verificar a lista na aba Environment Variables
 - [ ] 4.4 Fazer o deploy e verificar no log de build que `prisma migrate deploy` aplicou todas as migrations e que a rota de health responde 200
@@ -26,6 +27,7 @@
 ## 5. Projeto Vercel do app
 
 - [ ] 5.1 Importar o fork como projeto `crm-app`, Root Directory `apps/app`, com o mesmo banco e as mesmas variáveis de auth/URLs da API; verificar que `BETTER_AUTH_SECRET` é idêntico nos dois projetos
+- [ ] 5.1.1 Definir Function Region `fra1` (Frankfurt) em Settings → Functions do projeto `crm-app` e verificar no log do deploy
 - [ ] 5.2 Fazer o deploy e verificar que a URL `*.vercel.app` do app carrega a página de login
 
 ## 6. Domínios
@@ -47,6 +49,7 @@
 ## 9. Validação ponta a ponta
 
 - [ ] 9.1 Login do usuário principal em `https://crm.guardon.me` e verificar que ele vira owner do workspace e conclui o onboarding
+- [ ] 9.1.1 Definir EUR como moeda base do workspace em Configurações → Moedas e verificar que um negócio novo nasce em EUR
 - [ ] 9.2 Login de cada membro da equipe e verificar acesso; tentar com uma conta fora da lista e verificar recusa
 - [ ] 9.3 Conectar o Gmail, enviar um e-mail de teste de um contato e verificar que aparece na linha do tempo em até ~15 min
 - [ ] 9.4 Abrir a aba Agente de um contato e verificar a mensagem de "não configurado" sem quebrar a página

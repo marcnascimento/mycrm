@@ -34,6 +34,10 @@ Deploys da Vercel saem da branch `release` do fork (Production Branch na Vercel 
 Integração injeta `DATABASE_URL` (pooled) e `POSTGRES_URL_NON_POOLING`; o build usa a conexão direta para `prisma migrate deploy`. 0,5 GB atende 3–4 usuários.
 - *Alternativa*: Supabase Free. Equivalente; Neon escolhido pela integração nativa e pelo suporte explícito a `POSTGRES_URL_NON_POOLING` no `.env.example`.
 
+### D3.1 — Banco e funções na mesma região europeia (Frankfurt)
+A equipe está em Portugal. Neon em `aws-eu-central-1` (Frankfurt) e Function Region `fra1` nos dois projetos Vercel, configurada no painel (Settings → Functions) em vez de `regions` no `vercel.json`, para não divergir do `upstream`. O padrão do Hobby é `iad1`; manter o padrão colocaria ~90 ms de latência transatlântica em cada consulta ao banco.
+- *Alternativa*: Londres (`eu-west-2` / `lhr1`). Equivalente em latência para Lisboa; Frankfurt escolhido por ser a região europeia mais completa em ambos os provedores.
+
 ### D4 — Crons diárias na Vercel + GitHub Actions para caixas de e-mail
 `apps/api/vercel.json` passa a ter todas as crons diárias (compatível com Hobby). Um workflow agendado no fork chama `GET https://api.guardon.me/internal/sync/mailboxes` com `Authorization: Bearer $CRON_SECRET` a cada 10 minutos. As rotas já aceitam GET e POST e já validam `CRON_SECRET` em tempo constante.
 - *Alternativa*: cron-job.org. Viável, mas coloca o segredo em mais um serviço externo; GitHub Actions mantém tudo no fork.
