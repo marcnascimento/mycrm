@@ -26,8 +26,8 @@ Deploys da Vercel saem da branch `release` do fork (Production Branch na Vercel 
 - *Alternativa*: cópia sem vínculo (novo repositório). Descartada: perde o caminho de atualização.
 - Workflows herdados que não se aplicam ao fork (`auto-pr`, `release`, `pr-base`, `pr-title`) são desativados pela interface do GitHub (Actions → workflow → Disable), sem editar os arquivos, para não criar conflitos com o `upstream`.
 
-### D2 — Dois projetos Vercel, um por app, com Root Directory em `apps/app` e `apps/api`
-É o modelo que o projeto original já espera (um `vercel.json` por app). Domínios: `crm.guardon.me` → app, `api.guardon.me` → API. `AUTH_COOKIE_DOMAIN=.guardon.me` para uma sessão cobrir ambos.
+### D2 — Dois projetos Vercel: `crm-app` (Root Directory `apps/app`) e `crm-api` (Root Directory na raiz)
+O `crm-api` usa Framework Preset "Other", Build Command `node apps/api/scripts/build-func.mjs` e Install Command `bun install`, porque o script grava a Build Output API em `<raiz>/.vercel/output`. O `crm-app` é um projeto Next.js comum em `apps/app`. Domínios: `crm.guardon.me` → app, `api.guardon.me` → API. `AUTH_COOKIE_DOMAIN=.guardon.me` para uma sessão cobrir ambos.
 - *Alternativa*: API servida sob o mesmo domínio do app via rewrites. Descartada: diverge do upstream e complica `/api/auth/*`.
 
 ### D3 — Neon Free via Vercel Marketplace
@@ -35,11 +35,13 @@ Integração injeta `DATABASE_URL` (pooled) e `POSTGRES_URL_NON_POOLING`; o buil
 - *Alternativa*: Supabase Free. Equivalente; Neon escolhido pela integração nativa e pelo suporte explícito a `POSTGRES_URL_NON_POOLING` no `.env.example`.
 
 ### D3.1 — Banco e funções na mesma região europeia (Frankfurt)
-A equipe está em Portugal. Neon em `aws-eu-central-1` (Frankfurt) e Function Region `fra1` nos dois projetos Vercel, configurada no painel (Settings → Functions) em vez de `regions` no `vercel.json`, para não divergir do `upstream`. O padrão do Hobby é `iad1`; manter o padrão colocaria ~90 ms de latência transatlântica em cada consulta ao banco.
+A equipe está em Portugal. Neon em `aws-eu-central-1` (Frankfurt) e funções em `fra1`. O padrão do Hobby é `iad1`; manter o padrão colocaria ~90 ms de latência transatlântica em cada consulta ao banco.
+- **API**: o `crm-api` é publicado pela Build Output API via `apps/api/scripts/build-func.mjs`, que grava `regions` em `.vc-config.json` e ignora a Function Region do painel. A região é alterada nesse script (`iad1` → `fra1`).
+- **App**: Next.js respeita a Function Region do painel (Settings → Functions → `fra1`).
 - *Alternativa*: Londres (`eu-west-2` / `lhr1`). Equivalente em latência para Lisboa; Frankfurt escolhido por ser a região europeia mais completa em ambos os provedores.
 
 ### D4 — Crons diárias na Vercel + GitHub Actions para caixas de e-mail
-`apps/api/vercel.json` passa a ter todas as crons diárias (compatível com Hobby). Um workflow agendado no fork chama `GET https://api.guardon.me/internal/sync/mailboxes` com `Authorization: Bearer $CRON_SECRET` a cada 10 minutos. As rotas já aceitam GET e POST e já validam `CRON_SECRET` em tempo constante.
+`apps/api/vercel.json` passa a ter todas as crons diárias (compatível com Hobby) e vira a fonte única: o `build-func.mjs` gravava no `config.json` da Build Output API uma cron própria (`/internal/sync/google`, `*/5`), independente do `vercel.json`; agora ele lê as crons do `vercel.json`. Um workflow agendado no fork chama `GET https://api.guardon.me/internal/sync/mailboxes` com `Authorization: Bearer $CRON_SECRET` a cada 10 minutos. As rotas já aceitam GET e POST e já validam `CRON_SECRET` em tempo constante.
 - *Alternativa*: cron-job.org. Viável, mas coloca o segredo em mais um serviço externo; GitHub Actions mantém tudo no fork.
 - *Trade-off*: o agendamento do GitHub Actions atrasa em horários de pico e é pausado após 60 dias sem atividade no repositório.
 

@@ -2,8 +2,8 @@
 
 - [x] 1.1 Criar o fork de `trycompai/crm` na conta GitHub do usuário e verificar que ele aparece em `github.com/<usuario>/crm`
 - [x] 1.2 Renomear o remote local `origin` para `upstream`, adicionar o fork como `origin` e verificar com `git remote -v`
-- [ ] 1.3 Commitar `openspec/` e as adaptações na branch `release` e verificar o push com `git log origin/release -1`
-- [ ] 1.5 No fork, habilitar Actions e desativar os workflows `auto-pr`, `release`, `pr-base` e `pr-title`; verificar que apenas `CI` e `Sync mailboxes` aparecem ativos
+- [x] 1.3 Commitar `openspec/` e as adaptações na branch `release` e verificar o push com `git log origin/release -1`
+- [x] 1.5 No fork, habilitar Actions e desativar os workflows `auto-pr`, `release`, `pr-base` e `pr-title`; verificar que apenas `CI` e `Sync mailboxes` aparecem ativos
 - [x] 1.4 Confirmar que `.env` não está versionado (`git check-ignore .env` retorna `.env`)
 
 ## 2. Adaptação ao plano Hobby
@@ -14,12 +14,12 @@
 
 ## 3. Banco de dados
 
-- [ ] 3.1 Criar o banco Neon Free pela Vercel Marketplace (região `aws-eu-central-1` (Frankfurt)) e verificar que `DATABASE_URL` e `POSTGRES_URL_NON_POOLING` foram gerados
+- [x] 3.1 Criar o banco Neon Free pela Vercel Marketplace (região `aws-eu-central-1` (Frankfurt)) e verificar que `DATABASE_URL` e `POSTGRES_URL_NON_POOLING` foram gerados
 
 ## 4. Projeto Vercel da API
 
-- [ ] 4.1 Importar o fork na Vercel como projeto `crm-api`, Root Directory `apps/api`, e conectar o banco Neon ao projeto
-- [ ] 4.1.1 Definir Function Region `fra1` (Frankfurt) em Settings → Functions do projeto `crm-api` e verificar no log do deploy que as funções rodam em `fra1`
+- [ ] 4.1 Importar o fork na Vercel como projeto `crm-api`: Root Directory na raiz do repositório, Framework Preset "Other", Build Command `node apps/api/scripts/build-func.mjs`, Install Command `bun install`, Production Branch `release`; conectar o banco Neon ao projeto
+- [x] 4.1.1 Fixar a região das funções da API em `fra1` e as crons diárias em `apps/api/scripts/build-func.mjs` (lendo de `apps/api/vercel.json`); verificado com build local: `.vc-config.json` com `fra1` e `config.json` com 5 crons diárias
 - [ ] 4.2 Gerar segredos novos de produção (`BETTER_AUTH_SECRET`, `CRON_SECRET` ≥16 chars, `AGENT_BRIDGE_SECRET`) e guardá-los num gerenciador de senhas; verificar que nenhum é igual ao do `.env` local
 - [ ] 4.3 Configurar as variáveis da API (`BETTER_AUTH_SECRET`, `ALLOWED_SIGN_IN`, `GOOGLE_CLIENT_ID/SECRET`, `CRON_SECRET`, `API_URL=https://api.guardon.me`, `APP_URL=https://crm.guardon.me`, `AUTH_COOKIE_DOMAIN=.guardon.me`) e verificar a lista na aba Environment Variables
 - [ ] 4.4 Fazer o deploy e verificar no log de build que `prisma migrate deploy` aplicou todas as migrations e que a rota de health responde 200
