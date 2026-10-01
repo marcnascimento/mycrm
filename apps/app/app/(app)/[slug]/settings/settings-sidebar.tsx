@@ -2,9 +2,11 @@
 
 import { Button } from "@crm/ui/components/button";
 import { cn } from "@crm/ui/lib/utils";
+import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useMemo } from "react";
+import { useTRPC } from "@/lib/trpc/client";
 import { useWorkspaceUrl } from "@/lib/use-workspace-url";
 
 type SettingsNavItem = {
@@ -22,6 +24,10 @@ const ITEMS: SettingsNavItem[] = [
 	{ title: "Members", href: `${ROOT}/members` },
 	{ title: "API Keys", href: `${ROOT}/api-keys` },
 	{ title: "SSO", href: `${ROOT}/sso` },
+];
+
+const OWNER_ITEMS: SettingsNavItem[] = [
+	{ title: "Proposals", href: `${ROOT}/proposals` },
 ];
 
 function isActive(href: string, root: string, pathname: string): boolean {
@@ -105,11 +111,18 @@ export function SettingsSidebarFallback() {
 export function SettingsSidebar() {
 	const pathname = usePathname();
 	const workspaceUrl = useWorkspaceUrl();
+	const trpc = useTRPC();
+	const access = useQuery(trpc.proposals.access.queryOptions());
+	const canManageProposals = access.data?.canManage === true;
 
 	const root = workspaceUrl(ROOT);
 	const items = useMemo(
-		() => ITEMS.map((item) => ({ ...item, href: workspaceUrl(item.href) })),
-		[workspaceUrl],
+		() =>
+			[...ITEMS, ...(canManageProposals ? OWNER_ITEMS : [])].map((item) => ({
+				...item,
+				href: workspaceUrl(item.href),
+			})),
+		[workspaceUrl, canManageProposals],
 	);
 
 	return (

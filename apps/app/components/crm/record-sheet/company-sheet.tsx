@@ -34,6 +34,7 @@ import {
 	savingValue,
 } from "@/components/crm/inline-field";
 import { OwnerCell } from "@/components/crm/owner-cell";
+import { CompanyProposalProfile } from "@/components/crm/proposals/company-proposal-profile";
 import { CompanySocials } from "@/components/crm/social-links";
 import { DealStageMenu } from "@/components/crm/stage-change";
 import { Timeline } from "@/components/crm/timeline/timeline";
@@ -418,6 +419,8 @@ function CompanyOverview({ company }: { company: Company }) {
 							<CompanySocials company={company} />
 						</DetailSheetSection>
 					) : null}
+
+					<CompanyProposalProfile companyId={company.id} />
 				</DetailSheetRail>
 			</DetailSheetSplit>
 		</DetailSheetBody>

@@ -29,6 +29,7 @@ export {
 	type WorkspaceRole,
 	workspaceRoleOf,
 } from "./organization";
+export { canManageProposals } from "./proposals";
 export {
 	CALENDAR_SCOPE,
 	GMAIL_SCOPE,

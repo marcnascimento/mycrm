@@ -26,6 +26,7 @@ import { enrichmentQueueInput } from "@crm/validation/enrichment-queue";
 import { fieldListInput, fieldListOutput, fieldByKeyInput, serializedFieldOutput, fieldEntityInput, fieldFiltersOutput, fieldIdInput, fieldCoverageOutput, fieldCreateInput, fieldUpdateArgs, fieldReorderInput, fieldReorderOutput, fieldDeleteOutput, fieldBackfillOutput } from "../fields/fields.contracts";
 import { googleConnectionStatusOutput, setAutoCreateInput, suppressDomainInput, suppressDomainOutput, threadInput, emailThreadOutput, calendarEventInput, calendarEventOutput } from "../google/google.contracts";
 import { purgeSyncedDataOutput, revokeAccessOutput, microsoftConnectionStatusOutput, setOutlookAutoCreateInput } from "../microsoft/microsoft.contracts";
+import { accessOutput, issuersOutput, createIssuerInput, idInput, updateIssuerInput, okOutput, uploadTemplateInput, templateOutput, fileOutput, companyInput, companyProfileOutput, setCompanyIssuerInput, setClientLogoInput, listServicesInput, servicesOutput, serviceOutput, saveServiceInput, dealInput, dealProposalsOutput, draftInput, draftOutput, generateInput, generateOutput, downloadInput, uploadFinalInput, setStatusInput, setStatusOutput } from "../proposals/proposals.contracts";
 import { savedViewListInput, savedViewListOutput, savedViewCreateInput, savedViewOutput, savedViewUpdateArgs, savedViewIdInput, savedViewDeleteOutput } from "../saved-views/saved-views.contracts";
 import { agentModelOutput, modelCatalogOutput, setAgentModelInput, researchKeyOutput, setResearchKeyInput, archiveRetentionOutput, setArchiveRetentionDaysInput } from "../settings/settings.contracts";
 import { slackStatusOutput, slackMatchesOutput, slackChannelsInput, slackChannelsOutput, slackJoinChannelInput, slackJoinChannelOutput, slackRefreshPeopleOutput, slackCreateChannelInput, slackCreateChannelOutput, slackDisconnectOutput } from "../slack/slack.contracts";
@@ -574,6 +575,98 @@ const appRouter = t.router({
     setAutoCreate: publicProcedure
       .input(setOutlookAutoCreateInput)
       .output(microsoftConnectionStatusOutput)
+      .mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
+    }),
+  proposals: t.router({
+    access: publicProcedure
+      .output(accessOutput)
+      .query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    issuers: publicProcedure
+      .output(issuersOutput)
+      .query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    createIssuer: publicProcedure
+      .input(createIssuerInput)
+      .output(idInput)
+      .mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    updateIssuer: publicProcedure
+      .input(updateIssuerInput)
+      .output(idInput)
+      .mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    deleteIssuer: publicProcedure
+      .input(idInput)
+      .output(okOutput)
+      .mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    uploadTemplate: publicProcedure
+      .input(uploadTemplateInput)
+      .output(templateOutput)
+      .mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    archiveTemplate: publicProcedure
+      .input(idInput)
+      .output(okOutput)
+      .mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    downloadTemplate: publicProcedure
+      .input(idInput)
+      .output(fileOutput)
+      .query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    companyProfile: publicProcedure
+      .input(companyInput)
+      .output(companyProfileOutput)
+      .query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    setCompanyIssuer: publicProcedure
+      .input(setCompanyIssuerInput)
+      .output(companyProfileOutput)
+      .mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    setClientLogo: publicProcedure
+      .input(setClientLogoInput)
+      .output(companyProfileOutput)
+      .mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    removeClientLogo: publicProcedure
+      .input(companyInput)
+      .output(companyProfileOutput)
+      .mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    services: publicProcedure
+      .input(listServicesInput)
+      .output(servicesOutput)
+      .query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    service: publicProcedure
+      .input(idInput)
+      .output(serviceOutput)
+      .query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    saveService: publicProcedure
+      .input(saveServiceInput)
+      .output(serviceOutput)
+      .mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    archiveService: publicProcedure
+      .input(idInput)
+      .output(okOutput)
+      .mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    restoreService: publicProcedure
+      .input(idInput)
+      .output(okOutput)
+      .mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    forDeal: publicProcedure
+      .input(dealInput)
+      .output(dealProposalsOutput)
+      .query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    draft: publicProcedure
+      .input(draftInput)
+      .output(draftOutput)
+      .query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    generate: publicProcedure
+      .input(generateInput)
+      .output(generateOutput)
+      .mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    download: publicProcedure
+      .input(downloadInput)
+      .output(fileOutput)
+      .query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    uploadFinal: publicProcedure
+      .input(uploadFinalInput)
+      .output(okOutput)
+      .mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    setStatus: publicProcedure
+      .input(setStatusInput)
+      .output(setStatusOutput)
       .mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
     }),
   savedViews: t.router({

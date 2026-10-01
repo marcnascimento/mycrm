@@ -36,6 +36,7 @@ import {
 	savingValue,
 } from "@/components/crm/inline-field";
 import { OwnerCell } from "@/components/crm/owner-cell";
+import { DealProposals } from "@/components/crm/proposals/deal-proposals";
 import { DealStageMenu } from "@/components/crm/stage-change";
 import { StageStepper } from "@/components/crm/stage-stepper";
 import { Timeline } from "@/components/crm/timeline/timeline";
@@ -132,6 +133,7 @@ export function DealSheet({ dealId }: { dealId: string }) {
 
 	const query = useQuery(trpc.deals.byId.queryOptions({ id: dealId }));
 	const deal = query.data;
+	const proposalAccess = useQuery(trpc.proposals.access.queryOptions());
 
 	const tabs: DetailSheetTab[] = deal
 		? [
@@ -158,6 +160,15 @@ export function DealSheet({ dealId }: { dealId: string }) {
 					label: "Activity",
 					content: <Timeline anchor={{ dealId: deal.id }} />,
 				},
+				...(proposalAccess.data?.canManage
+					? [
+							{
+								value: "proposals",
+								label: "Proposals",
+								content: <DealProposals dealId={deal.id} />,
+							},
+						]
+					: []),
 				{
 					value: "agent",
 					label: "Agent",

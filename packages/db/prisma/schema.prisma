@@ -318,6 +318,10 @@ model Company {
 
   source RecordSource @default(MANUAL)
 
+  issuerId     String?
+  issuer       Issuer?     @relation(fields: [issuerId], references: [id], onDelete: Restrict)
+  proposalLogo ClientLogo?
+
   lastActivityAt DateTime?
   archivedAt     DateTime?
 
@@ -336,6 +340,7 @@ model Company {
   @@index([name])
   @@index([lastActivityAt])
   @@index([archivedAt])
+  @@index([issuerId])
   @@map("company")
 }
 
@@ -942,6 +947,7 @@ model Deal {
   contacts    DealContact[]
   activities  Activity[]
   fieldValues FieldValue[]
+  proposals   Proposal[]
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 
@@ -1582,4 +1588,141 @@ model Apikey {
   @@index([configId])
   @@index([key])
   @@map("apikey")
+}
+
+enum ProposalStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  REJECTED
+}
+
+enum ProposalJurisdiction {
+  PT
+  ES
+}
+
+model Issuer {
+  id              String   @id @default(cuid())
+  name            String
+  numberPrefix    String   @default("")
+  defaultPayments Json
+  active          Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  companies Company[]
+  templates IssuerTemplate[]
+  prices    ServicePrice[]
+  proposals Proposal[]
+
+  @@unique([name])
+  @@map("issuer")
+}
+
+model IssuerTemplate {
+  id           String    @id @default(cuid())
+  issuerId     String
+  issuer       Issuer    @relation(fields: [issuerId], references: [id], onDelete: Restrict)
+  name         String
+  fileName     String
+  content      Bytes
+  size         Int
+  markers      String[]
+  logoSlot     Json?
+  uploadedById String
+  createdAt    DateTime  @default(now())
+  archivedAt   DateTime?
+
+  proposals Proposal[]
+
+  @@index([issuerId, archivedAt])
+  @@map("issuerTemplate")
+}
+
+model ClientLogo {
+  companyId    String   @id
+  company      Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  content      Bytes
+  width        Int
+  height       Int
+  uploadedById String
+  updatedAt    DateTime @updatedAt
+
+  @@map("clientLogo")
+}
+
+model Service {
+  id         String    @id @default(cuid())
+  name       String
+  content    Json
+  archivedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  prices    ServicePrice[]
+  proposals Proposal[]
+
+  @@index([archivedAt])
+  @@map("service")
+}
+
+model ServicePrice {
+  serviceId String
+  service   Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  issuerId  String
+  issuer    Issuer  @relation(fields: [issuerId], references: [id], onDelete: Restrict)
+  amount    Decimal @db.Decimal(14, 2)
+  extras    Json
+
+  @@id([serviceId, issuerId])
+  @@index([issuerId])
+  @@map("servicePrice")
+}
+
+model Proposal {
+  id      String @id @default(cuid())
+  dealId  String
+  deal    Deal   @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  version Int
+
+  issuerId     String
+  issuer       Issuer          @relation(fields: [issuerId], references: [id], onDelete: Restrict)
+  issuerName   String
+  templateId   String?
+  template     IssuerTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
+  templateName String
+  serviceId    String?
+  service      Service?        @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+
+  number             String
+  date               DateTime             @db.Date
+  attentionContactId String?
+  attentionName      String               @default("")
+  attentionPosition  String               @default("")
+  jurisdiction       ProposalJurisdiction
+  jurisdictionText   String
+
+  content  Json
+  lines    Json
+  extras   Json
+  payments Json
+  total    Decimal @db.Decimal(14, 2)
+  currency String  @default("EUR")
+
+  status          ProposalStatus @default(DRAFT)
+  statusChangedAt DateTime       @default(now())
+
+  generatedFile     Bytes
+  generatedFileName String
+  finalFile         Bytes?
+  finalFileName     String?
+  finalUploadedAt   DateTime?
+
+  createdById String
+  createdAt   DateTime @default(now())
+
+  @@unique([dealId, version])
+  @@index([issuerId])
+  @@map("proposal")
 }
