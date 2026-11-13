@@ -426,7 +426,7 @@ async function seedIcons(
 }
 
 const ACCOUNT_TYPES = ["Prospect", "Customer", "Partner", "Churned"] as const;
-const ACCOUNT_TYPE_OPTIONS = [
+export const ACCOUNT_TYPE_OPTIONS = [
 	...ACCOUNT_TYPES,
 	"Competitor",
 	"Investor",
@@ -530,7 +530,7 @@ async function upsertField(
  * "Investor" on "Account type") is not a no-op on a database that already
  * has that field.
  */
-async function ensureFieldOptions(
+export async function ensureFieldOptions(
 	entity: FieldEntity,
 	label: string,
 	labels: readonly string[],
@@ -562,7 +562,7 @@ async function ensureFieldOptions(
 
 const EVENTS = ["Web Summit Lisboa 2026"] as const;
 
-async function seedContactCustomFields(): Promise<void> {
+export async function seedContactCustomFields(): Promise<void> {
 	await Promise.all([
 		upsertField(
 			"CONTACT",
@@ -603,7 +603,7 @@ async function seedContactCustomFields(): Promise<void> {
 	await ensureFieldOptions("CONTACT", "Evento de origem", EVENTS);
 }
 
-async function seedCompanyFields(): Promise<SeededFieldSet> {
+export async function seedCompanyFields(): Promise<SeededFieldSet> {
 	const [
 		accountType,
 		segment,
@@ -1129,11 +1129,15 @@ async function main() {
 	);
 }
 
-main()
-	.catch((error) => {
-		console.error(error);
-		process.exitCode = 1;
-	})
-	.finally(async () => {
-		await db.$disconnect();
-	});
+// Guarded so `seed-import-fields.ts` can import the field-seeding helpers
+// below without triggering a full run of this script's demo-data seed.
+if (import.meta.main) {
+	main()
+		.catch((error) => {
+			console.error(error);
+			process.exitCode = 1;
+		})
+		.finally(async () => {
+			await db.$disconnect();
+		});
+}
